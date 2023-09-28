@@ -1,30 +1,65 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <numeric>
-#include <iomanip>
-
 
 using namespace std;
+
+float skaiciuotiVidurki(vector<int>& pazymiai) {
+    int suma = accumulate(pazymiai.begin(), pazymiai.end(), 0);
+    return static_cast<float>(suma) / pazymiai.size();
+}
+
+float skaiciuotiMediana(vector<int>& pazymiai) {
+    size_t dydis = pazymiai.size();
+    sort(pazymiai.begin(), pazymiai.end());
+
+    if (dydis % 2 == 0) {
+        // Lyginis skaičius duomenų, medianą randame vidurinių elementų vidurkį
+        int vidurys1 = pazymiai[dydis / 2 - 1];
+        int vidurys2 = pazymiai[dydis / 2];
+        return static_cast<float>(vidurys1 + vidurys2) / 2.0;
+    } else {
+        // Nelyginis skaičius duomenų, medianą randame tiesiog vidurinį elementą
+        return pazymiai[dydis / 2];
+    }
+}
+
+float skaiciuotiGalutini(vector<int>& nd, int egzaminas, bool naudotiVidurki) {
+    if (naudotiVidurki) {
+        nd.push_back(egzaminas);  // Pridedame egzamino balą prie namų darbų pažymių
+        return skaiciuotiVidurki(nd);
+    } else {
+        nd.push_back(egzaminas);  // Pridedame egzamino balą prie namų darbų pažymių
+        return skaiciuotiMediana(nd);
+    }
+}
 
 struct zmogus {
     string vardas;
     string pavarde;
     vector<int> nd;
-    int egz;
-    float vid;
+    float rezultatas;  // Pridėtas rezultato kintamasis
 };
 
 int main() {
     zmogus laikinas;
     vector<zmogus> grupe;
     int zmoniu_sk;
+    string skaiciavimoMetodas;
 
     cout << "Iveskite mokiniu skaiciu: " << endl;
     cin >> zmoniu_sk;
 
+    cout << "Pasirinkite skaiciavimo metoda: (Vid) - vidurkis, (Med) - mediana" << endl;
+    cin >> skaiciavimoMetodas;
+
+    bool naudotiVidurki = (skaiciavimoMetodas == "Vid");
+
     for (int j = 0; j < zmoniu_sk; j++) {
         cout << "Iveskite varda ir pavarde " << endl;
         cin >> laikinas.vardas >> laikinas.pavarde;
+
         cout << "Kiek namu darbu pazymiu turi zmogus? " << endl;
         int n;
         cin >> n;
@@ -37,20 +72,16 @@ int main() {
         }
 
         cout << "Iveskite egzamino bala " << endl;
-        cin >> laikinas.egz;
+        cin >> laikinas.rezultatas;
 
-        // Skaičiuojame galutinį vidurkį
-        laikinas.vid = (accumulate(laikinas.nd.begin(), laikinas.nd.end(), 0) + laikinas.egz) / static_cast<float>(laikinas.nd.size() + 1);
+        laikinas.rezultatas = skaiciuotiGalutini(laikinas.nd, laikinas.rezultatas, naudotiVidurki);
 
         grupe.push_back(laikinas);
         laikinas.nd.clear();
     }
 
-    // Spausdiname rezultatus su dviem skaičiais po kablelio
-    cout << fixed << setprecision(2);
-
-    for (auto &a : grupe) {
-        cout << a.vardas << " " << a.pavarde << " " << a.vid << endl;
+    for (auto& a : grupe) {
+        cout << a.vardas << " " << a.pavarde << " " << a.rezultatas << endl;
     }
 
     return 0;
