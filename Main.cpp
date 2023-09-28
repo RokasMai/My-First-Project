@@ -2,14 +2,26 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <string>
+#include <iomanip>
 
 using namespace std;
+
+struct zmogus {
+    string vardas;
+    string pavarde;
+    vector<int> nd;
+    float rezultatas;  // Pridėtas rezultato kintamasis
+};
+
+bool palygintiPagalPavarde(const zmogus& zmogus1, const zmogus& zmogus2) {
+    return zmogus1.pavarde < zmogus2.pavarde;
+}
 
 float skaiciuotiVidurki(vector<int>& pazymiai) {
     int suma = accumulate(pazymiai.begin(), pazymiai.end(), 0);
     return static_cast<float>(suma) / pazymiai.size();
 }
-
 float skaiciuotiMediana(vector<int>& pazymiai) {
     size_t dydis = pazymiai.size();
     sort(pazymiai.begin(), pazymiai.end());
@@ -35,12 +47,7 @@ float skaiciuotiGalutini(vector<int>& nd, int egzaminas, bool naudotiVidurki) {
     }
 }
 
-struct zmogus {
-    string vardas;
-    string pavarde;
-    vector<int> nd;
-    float rezultatas;  // Pridėtas rezultato kintamasis
-};
+
 
 int main() {
     zmogus laikinas;
@@ -78,10 +85,13 @@ int main() {
 
         grupe.push_back(laikinas);
         laikinas.nd.clear();
+
+        sort(grupe.begin(), grupe.end(), palygintiPagalPavarde);
+
     }
 
     for (auto& a : grupe) {
-        cout << a.vardas << " " << a.pavarde << " " << a.rezultatas << endl;
+        cout << a.vardas << " " << a.pavarde << " " << setprecision(3) <<a.rezultatas << endl;
     }
 
     return 0;
