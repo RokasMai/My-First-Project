@@ -1,97 +1,157 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
-#include <algorithm>
+#include <cstdlib>
+#include <ctime>
 #include <numeric>
-#include <string>
+#include <algorithm>
 #include <iomanip>
+#include <sstream>
 
 using namespace std;
 
-struct zmogus {
+struct Studentas {
     string vardas;
     string pavarde;
-    vector<int> nd;
-    float rezultatas;  // Pridėtas rezultato kintamasis
+    vector<int> tarpiniai_rezultatai;
+    int egzamino_rezultatas;
 };
 
-bool palygintiPagalPavarde(const zmogus& zmogus1, const zmogus& zmogus2) {
-    return zmogus1.pavarde < zmogus2.pavarde;
-}
+double skaiciuotiGalutiniBala(const Studentas& studentas, const string& tipas) {
+    if (tipas == "Vid") {
+        double tarpiniuVidurkis = accumulate(studentas.tarpiniai_rezultatai.begin(), studentas.tarpiniai_rezultatai.end(), 0.0) / studentas.tarpiniai_rezultatai.size();
+        return tarpiniuVidurkis;
+    } else if (tipas == "Med") {
+        vector<int> visiPazymiai = studentas.tarpiniai_rezultatai;
+        visiPazymiai.push_back(studentas.egzamino_rezultatas);
+        sort(visiPazymiai.begin(), visiPazymiai.end());
 
-float skaiciuotiVidurki(vector<int>& pazymiai) {
-    int suma = accumulate(pazymiai.begin(), pazymiai.end(), 0);
-    return static_cast<float>(suma) / pazymiai.size();
-}
-float skaiciuotiMediana(vector<int>& pazymiai) {
-    size_t dydis = pazymiai.size();
-    sort(pazymiai.begin(), pazymiai.end());
-
-    if (dydis % 2 == 0) {
-        // Lyginis skaičius duomenų, medianą randame vidurinių elementų vidurkį
-        int vidurys1 = pazymiai[dydis / 2 - 1];
-        int vidurys2 = pazymiai[dydis / 2];
-        return static_cast<float>(vidurys1 + vidurys2) / 2.0;
+        int dydis = visiPazymiai.size();
+        if (dydis % 2 == 0) {
+            int vidurioIndeksas = dydis / 2;
+            return (visiPazymiai[vidurioIndeksas - 1] + visiPazymiai[vidurioIndeksas]) / 2.0;
+        } else {
+            return visiPazymiai[dydis / 2];
+        }
     } else {
-        // Nelyginis skaičius duomenų, medianą randame tiesiog vidurinį elementą
-        return pazymiai[dydis / 2];
+        cout << "Netinkamas tipo, naudojamas vidurkis." << endl;
+        double tarpiniuVidurkis = accumulate(studentas.tarpiniai_rezultatai.begin(), studentas.tarpiniai_rezultatai.end(), 0.0) / studentas.tarpiniai_rezultatai.size();
+        return tarpiniuVidurkis;
     }
 }
 
-float skaiciuotiGalutini(vector<int>& nd, int egzaminas, bool naudotiVidurki) {
-    if (naudotiVidurki) {
-        nd.push_back(egzaminas);  // Pridedame egzamino balą prie namų darbų pažymių
-        return skaiciuotiVidurki(nd);
-    } else {
-        nd.push_back(egzaminas);  // Pridedame egzamino balą prie namų darbų pažymių
-        return skaiciuotiMediana(nd);
-    }
-}
+void ivestiDuomenisRanka(vector<Studentas>& studentai) {
+    int studentuSkaicius;
+    cout << "Iveskite studentu skaiciu: ";
+    cin >> studentuSkaicius;
 
+    studentai.resize(studentuSkaicius);
 
+    for (int i = 0; i < studentuSkaicius; ++i) {
+        cout << "Iveskite " << i + 1 << "-ojo studento varda: ";
+        cin >> studentai[i].vardas;
 
-int main() {
-    zmogus laikinas;
-    vector<zmogus> grupe;
-    int zmoniu_sk;
-    string skaiciavimoMetodas;
+        cout << "Iveskite " << i + 1 << "-ojo studento pavarde: ";
+        cin >> studentai[i].pavarde;
 
-    cout << "Iveskite mokiniu skaiciu: " << endl;
-    cin >> zmoniu_sk;
-
-    cout << "Pasirinkite skaiciavimo metoda: (Vid) - vidurkis, (Med) - mediana" << endl;
-    cin >> skaiciavimoMetodas;
-
-    bool naudotiVidurki = (skaiciavimoMetodas == "Vid");
-
-    for (int j = 0; j < zmoniu_sk; j++) {
-        cout << "Iveskite varda ir pavarde " << endl;
-        cin >> laikinas.vardas >> laikinas.pavarde;
-
-        cout << "Kiek namu darbu pazymiu turi zmogus? " << endl;
-        int n;
-        cin >> n;
-
-        for (int i = 0; i < n; i++) {
-            int k;
-            cout << "Iveskite " << i + 1 << " pazymi " << endl;
-            cin >> k;
-            laikinas.nd.push_back(k);
+        cout << "Iveskite " << i + 1 << "-ojo studento tarpinius rezultatus (baigti su -1): ";
+        int tarpinis;
+        while (true) {
+            cin >> tarpinis;
+            if (tarpinis == -1) {
+                break;
+            }
+            studentai[i].tarpiniai_rezultatai.push_back(tarpinis);
         }
 
-        cout << "Iveskite egzamino bala " << endl;
-        cin >> laikinas.rezultatas;
+        cout << "Iveskite " << i + 1 << "-ojo studento egzamino rezultata: ";
+        cin >> studentai[i].egzamino_rezultatas;
+    }
+}
 
-        laikinas.rezultatas = skaiciuotiGalutini(laikinas.nd, laikinas.rezultatas, naudotiVidurki);
+void skaitytiDuomenisIsFailo(vector<Studentas>& studentai, const string& failoPavadinimas) {
+    ifstream failas(failoPavadinimas);
 
-        grupe.push_back(laikinas);
-        laikinas.nd.clear();
-
-        sort(grupe.begin(), grupe.end(), palygintiPagalPavarde);
-
+    if (!failas) {
+        cout << "Nepavyko atidaryti failo." << endl;
+        return;
     }
 
-    for (auto& a : grupe) {
-        cout << a.vardas << " " << a.pavarde << " " << setprecision(3) <<a.rezultatas << endl;
+    Studentas studentas;
+    string eilute;
+    while (getline(failas, eilute)) {
+        istringstream iss(eilute);
+        iss >> studentas.vardas >> studentas.pavarde;
+
+        studentas.tarpiniai_rezultatai.clear();
+        int pazymys;
+        while (iss >> pazymys) {
+            if (pazymys == -1) {
+                break;
+            }
+            studentas.tarpiniai_rezultatai.push_back(pazymys);
+        }
+
+        iss >> studentas.egzamino_rezultatas;
+
+        studentai.push_back(studentas);
+    }
+
+    failas.close();
+}
+
+void generuotiDuomenis(vector<Studentas>& studentai) {
+    int studentuSkaicius;
+    cout << "Iveskite studentu skaiciu: ";
+    cin >> studentuSkaicius;
+
+    studentai.resize(studentuSkaicius);
+
+    for (int i = 0; i < studentuSkaicius; ++i) {
+        cout << "Iveskite " << i + 1 << "-ojo studento varda: ";
+        cin >> studentai[i].vardas;
+
+        cout << "Iveskite " << i + 1 << "-ojo studento pavarde: ";
+        cin >> studentai[i].pavarde;
+
+        for (int j = 0; j < 5; ++j) {
+            int pazymys = rand() % 10 + 1;
+            studentai[i].tarpiniai_rezultatai.push_back(pazymys);
+        }
+
+        studentai[i].egzamino_rezultatas = rand() % 10 + 1;
+    }
+}
+
+int main() {
+    char pasirinkimas;
+    cout << "Pasirinkite buda, kaip vesti duomenis (I - ivesti ranka, S - skaityti is failo, G - generuoti atsitiktinai): ";
+    cin >> pasirinkimas;
+
+    vector<Studentas> studentai;
+
+    if (pasirinkimas == 'I') {
+        ivestiDuomenisRanka(studentai);
+    } else if (pasirinkimas == 'S') {
+        string failoPavadinimas;
+        cout << "Iveskite failo pavadinima (su pilnu keliasu, jei failas yra kitoje vietoje): ";
+        cin >> failoPavadinimas;
+        skaitytiDuomenisIsFailo(studentai, failoPavadinimas);
+    } else if (pasirinkimas == 'G') {
+        generuotiDuomenis(studentai);
+    } else {
+        cout << "Neteisingas pasirinkimas. Programa baigia darbą." << endl;
+        return 1;
+    }
+
+    string skaiciavimoBudas;
+    cout << "Pasirinkite skaiciavimo buda (Vid arba Med): ";
+    cin >> skaiciavimoBudas;
+
+    for (const auto& studentas : studentai) {
+        cout << "Studentas: " << studentas.vardas << " " << studentas.pavarde << endl;
+        cout << "Galutinis balas (" << skaiciavimoBudas << "): " << fixed << setprecision(2) << skaiciuotiGalutiniBala(studentas, skaiciavimoBudas) << endl;
+        cout << endl;
     }
 
     return 0;
