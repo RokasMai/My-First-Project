@@ -17,6 +17,7 @@ double skaiciuotiGalutiniBala(const Studentas& studentas, const std::string& tip
 void ivestiDuomenisRanka(std::vector<Studentas>& studentai);
 void skaitytiDuomenisIsFailo(std::vector<Studentas>& studentai, const std::string& failoPavadinimas);
 void generuotiDuomenis(std::vector<Studentas>& studentai);
-
+void generuotiFailus();
+void padalintiStudentusIFailus(const std::vector<Studentas>& studentai, const std::string& failasVargsiukai, const std::string& failasLyderiai);
 
 #endif
