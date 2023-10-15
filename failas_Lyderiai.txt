@@ -1,0 +1,5 @@
+Vardas Pavarde nan
+Lukas Jakonis 5.8
+Darius Stepas 8.6
+Simonas Zabielius 7.4
+Simas Galvalevicius 8.6
