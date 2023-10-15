@@ -111,3 +111,34 @@ void generuotiDuomenis(std::vector<Studentas>& studentai) {
         studentai[i].egzamino_rezultatas = rand() % 10 + 1;
     }
 }
+
+void generuotiFailus() {
+    const std::vector<int> irasuSkaiciai = {1000, 10000, 100000, 1000000, 10000000};
+    const std::string sabloninisVardas = "Vardas";
+    const std::string sabloninePavarde = "Pavarde";
+
+    for (int irasuSkaicius : irasuSkaiciai) {
+        std::string failoPavadinimas = "failas_" + std::to_string(irasuSkaicius) + ".txt";
+        std::ofstream failas(failoPavadinimas);
+
+        if (!failas) {
+            std::cout << "Nepavyko sukurti failo: " << failoPavadinimas << std::endl;
+            return;
+        }
+
+        for (int i = 1; i <= irasuSkaicius; ++i) {
+            failas << sabloninisVardas << i << " " << sabloninePavarde << i;
+
+            for (int j = 0; j < 5; ++j) {
+                int pazymys = rand() % 10 + 1;
+                failas << " " << pazymys;
+            }
+
+            int egzaminoBalas = rand() % 10 + 1;
+            failas << " " << egzaminoBalas << std::endl;
+        }
+
+        failas.close();
+        std::cout << "Sukurtas failas: " << failoPavadinimas << std::endl;
+    }
+}
