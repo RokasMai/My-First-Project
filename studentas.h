@@ -1,6 +1,8 @@
 #ifndef STUDENTAS_H_INCLUDED
 #define STUDENTAS_H_INCLUDED
 
+#pragma once
+
 #include <string>
 #include <vector>
 
@@ -15,7 +17,7 @@ double skaiciuotiGalutiniBala(const Studentas& studentas, const std::string& tip
 void ivestiDuomenisRanka(std::vector<Studentas>& studentai);
 void skaitytiDuomenisIsFailo(std::vector<Studentas>& studentai, const std::string& failoPavadinimas);
 void generuotiDuomenis(std::vector<Studentas>& studentai);
-void kategorizuotiStudentus(const std::vector<Studentas>& studentai, std::vector<Studentas>& vargsiukai, std::vector<Studentas>& kietiakiai);
-void isvestiStudentusIFailus(const std::vector<Studentas>& studentai, const std::string& failoPavadinimas);
+void generuotiFailus();
+void padalintiStudentusIFailus(const std::vector<Studentas>& studentai, const std::string& failasVargsiukai, const std::string& failasLyderiai);
 
 #endif
