@@ -23,11 +23,13 @@ int main() {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Išvalo buferį
 
         skaitytiDuomenisIsFailo(studentai, failoPavadinimas);
+
+        padalintiStudentusIFailus(studentai, "failas_Vargsiukai.txt", "failas_Lyderiai.txt");
     } else if (pasirinkimas == 'G') {
         generuotiDuomenis(studentai);
     } else if (pasirinkimas == 'F') {
         generuotiFailus();
-        return 0;  // Programa baigia darbą po failų generavimo.
+        return 0;
     } else {
         std::cout << "Neteisingas pasirinkimas. Programa baigia darbą." << std::endl;
         return 1;
