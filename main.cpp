@@ -55,11 +55,11 @@ int main() {
     std::cout << "Pasirinkite skaiciavimo buda (Vid arba Med): ";
     std::cin >> skaiciavimoBudas;
 
-    auto startRusiavimas = std::chrono::high_resolution_clock::now();
+    auto startRusiavimas = std::chrono::high_resolution_clock::now();//pradedamas matuoti rusiavimo laikas
     std::sort(studentai.begin(), studentai.end(), [](const Studentas& a, const Studentas& b) {
         return a.vardas < b.vardas;
     });
-    auto endRusiavimas = std::chrono::high_resolution_clock::now();
+    auto endRusiavimas = std::chrono::high_resolution_clock::now();//baigia matuoti rusiavimo laika
     auto durationRusiavimas = std::chrono::duration_cast<std::chrono::milliseconds>(endRusiavimas - startRusiavimas);
     std::cout << "Rusiavimas uztruko " << durationRusiavimas.count() << "ms" << std::endl;
 
@@ -71,7 +71,7 @@ int main() {
         std::cout << std::left << std::setw(20) << studentas.vardas << std::setw(20) << studentas.pavarde
                   << std::fixed << std::setprecision(2) << skaiciuotiGalutiniBala(studentas, skaiciavimoBudas) << std::endl;
     }
-    auto endIsvedimas = std::chrono::high_resolution_clock::now();
+    auto endIsvedimas = std::chrono::high_resolution_clock::now();//baigia matuoti isvedimo laika
     auto durationIsvedimas = std::chrono::duration_cast<std::chrono::milliseconds>(endIsvedimas - startIsvedimas);
     std::cout << "Isvedimas uztruko " << durationIsvedimas.count() << "ms" << std::endl;
 
