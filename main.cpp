@@ -6,7 +6,7 @@
 
 int main() {
     char pasirinkimas;
-    std::vector<Studentas> studentai;
+    std::list<Studentas> studentai;
 
     std::cout << "Pasirinkite buda, kaip vesti duomenis (I - ivesti ranka, S - skaityti is failo, G - generuoti atsitiktinai, F - generuoti failus): ";
     std::cin >> pasirinkimas;
