@@ -30,19 +30,23 @@ double skaiciuotiGalutiniBala(const Studentas& studentas, const std::string& tip
     }
 }
 
-void ivestiDuomenisRanka(std::vector<Studentas>& studentai) {
+void ivestiDuomenisRanka(std::list<Studentas>& studentai) {
     int studentuSkaicius;
     std::cout << "Iveskite studentu skaiciu: ";
     std::cin >> studentuSkaicius;
 
-    studentai.resize(studentuSkaicius);
+    studentai.clear(); // Išvalo sąrašą
 
     for (int i = 0; i < studentuSkaicius; ++i) {
+        Studentas studentas; // Sukuriama naujas studento objektas
+
         std::cout << "Iveskite " << i + 1 << "-ojo studento varda: ";
-        std::cin >> studentai[i].vardas;
+        std::cin >> studentas.vardas;
 
         std::cout << "Iveskite " << i + 1 << "-ojo studento pavarde: ";
-        std::cin >> studentai[i].pavarde;
+        std::cin >> studentas.pavarde;
+
+        studentas.tarpiniai_rezultatai.clear(); // Išvaloma tarpinių rezultatų lista
 
         std::cout << "Iveskite " << i + 1 << "-ojo studento tarpinius rezultatus (baigti su -1): ";
         int tarpinis;
@@ -51,11 +55,13 @@ void ivestiDuomenisRanka(std::vector<Studentas>& studentai) {
             if (tarpinis == -1) {
                 break;
             }
-            studentai[i].tarpiniai_rezultatai.push_back(tarpinis);
+            studentas.tarpiniai_rezultatai.push_back(tarpinis); // Pridedamas tarpinis rezultatas į list'ą
         }
 
         std::cout << "Iveskite " << i + 1 << "-ojo studento egzamino rezultata: ";
-        std::cin >> studentai[i].egzamino_rezultatas;
+        std::cin >> studentas.egzamino_rezultatas;
+
+        studentai.push_back(studentas); // Pridedamas studentas į list'ą
     }
 }
 
