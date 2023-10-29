@@ -65,7 +65,7 @@ void ivestiDuomenisRanka(std::list<Studentas>& studentai) {
     }
 }
 
-void skaitytiDuomenisIsFailo(std::vector<Studentas>& studentai, const std::string& failoPavadinimas) {
+void skaitytiDuomenisIsFailo(std::list<Studentas>& studentai, const std::string& failoPavadinimas) {
     std::ifstream failas(failoPavadinimas);
 
     if (!failas) {
@@ -73,28 +73,32 @@ void skaitytiDuomenisIsFailo(std::vector<Studentas>& studentai, const std::strin
         return;
     }
 
+    studentai.clear(); // Išvalo sąrašą
+
     Studentas studentas;
     std::string eilute;
     while (std::getline(failas, eilute)) {
         std::istringstream iss(eilute);
         iss >> studentas.vardas >> studentas.pavarde;
 
-        studentas.tarpiniai_rezultatai.clear();
+        studentas.tarpiniai_rezultatai.clear(); // Išvaloma tarpinių rezultatų lista
+
         int pazymys;
         while (iss >> pazymys) {
             if (pazymys == -1) {
                 break;
             }
-            studentas.tarpiniai_rezultatai.push_back(pazymys);
+            studentas.tarpiniai_rezultatai.push_back(pazymys); // Pridedamas tarpinis rezultatas į list'ą
         }
 
         iss >> studentas.egzamino_rezultatas;
 
-        studentai.push_back(studentas);
+        studentai.push_back(studentas); // Pridedamas studentas į list'ą
     }
 
     failas.close();
 }
+
 
 void generuotiDuomenis(std::vector<Studentas>& studentai) {
     int studentuSkaicius;
