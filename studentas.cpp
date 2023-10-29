@@ -100,28 +100,35 @@ void skaitytiDuomenisIsFailo(std::list<Studentas>& studentai, const std::string&
 }
 
 
-void generuotiDuomenis(std::vector<Studentas>& studentai) {
+void generuotiDuomenis(std::list<Studentas>& studentai) {
     int studentuSkaicius;
     std::cout << "Iveskite studentu skaiciu: ";
     std::cin >> studentuSkaicius;
 
-    studentai.resize(studentuSkaicius);
+    studentai.clear(); // Išvalo sąrašą
 
     for (int i = 0; i < studentuSkaicius; ++i) {
-        std::cout << "Iveskite " << i + 1 << "-ojo studento varda: ";
-        std::cin >> studentai[i].vardas;
+        Studentas studentas; // Sukuriama naujas studento objektas
 
-        std::cout << "Iveskite " << i + 1 << "-ojo studento pavarde: ";
-        std::cin >> studentai[i].pavarde;
+        std::cout << "Iveskite " << i + 1 << "-ojo studento varda: ";
+        std::cin >> studentas.vardas;
+
+        std.::cout << "Iveskite " << i + 1 << "-ojo studento pavarde: ";
+        std::cin >> studentas.pavarde;
+
+        studentas.tarpiniai_rezultatai.clear(); // Išvaloma tarpinių rezultatų lista
 
         for (int j = 0; j < 5; ++j) {
             int pazymys = rand() % 10 + 1;
-            studentai[i].tarpiniai_rezultatai.push_back(pazymys);
+            studentas.tarpiniai_rezultatai.push_back(pazymys); // Pridedamas tarpinis rezultatas į list'ą
         }
 
-        studentai[i].egzamino_rezultatas = rand() % 10 + 1;
+        studentas.egzamino_rezultatas = rand() % 10 + 1;
+
+        studentai.push_back(studentas); // Pridedamas studentas į list'ą
     }
 }
+
 void generuotiFailus() {
     const std::vector<int> irasuSkaiciai = {1000, 10000, 100000, 1000000, 10000000};
     const std::string sabloninisVardas = "Vardas";
