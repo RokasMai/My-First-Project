@@ -155,7 +155,8 @@ void padalintiStudentusIFailus(const std::vector<Studentas>& studentai, const st
         return;
     }
 
-    for (const auto& studentas : studentai) {
+    for (std::list<Studentas>::iterator it = studentai.begin(); it != studentai.end(); ++it) {
+        const Studentas& studentas = *it;
         double galutinis = skaiciuotiGalutiniBala(studentas, "Vid");
         if (galutinis < 5.0) {
             vargsiukaiFailas << studentas.vardas << " " << studentas.pavarde << " " << galutinis << std::endl;
