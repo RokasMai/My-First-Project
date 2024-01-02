@@ -7,7 +7,7 @@
 #include <numeric>
 #include <chrono>
 
-void wtf(std::vector<Studentas>& s, int num) {
+void wtf(std::list<Studentas>& s, int num) {
     std::string name = "out" ;
     name.append(std::to_string(num));
     std::cout << name << std::endl;
@@ -20,7 +20,7 @@ void wtf(std::vector<Studentas>& s, int num) {
     f.close();
 }
 
-void dalinimoBudas1(std::vector<Studentas>& studentai, std::vector<Studentas>& vargsai, std::vector<Studentas>& balleriai, std::string skBudas) {
+void dalinimoBudas1(std::list<Studentas>& studentai, std::list<Studentas>& vargsai, std::list<Studentas>& balleriai, std::string skBudas) {
     auto pirmasKietas = std::find_if(studentai.begin(), studentai.end(), [&](Studentas& s){
         return skaiciuotiGalutiniBala(s, skBudas) >= 5;
     });
@@ -32,14 +32,14 @@ void dalinimoBudas1(std::vector<Studentas>& studentai, std::vector<Studentas>& v
     wtf(balleriai, 2);
 }
 
-void dalinimoBudas2(std::vector<Studentas>& studentai, std::vector<Studentas>& balleriai, std::string skBudas) {
+void dalinimoBudas2(std::list<Studentas>& studentai, std::list<Studentas>& balleriai, std::string skBudas) {
     auto pirmasKietas = std::find_if(studentai.begin(), studentai.end(), [&](Studentas& s){
         return skaiciuotiGalutiniBala(s, skBudas) >= 5;
     });
 
     balleriai.assign(pirmasKietas, studentai.end());
     studentai.resize(studentai.size() - balleriai.size());
-    studentai.shrink_to_fit();
+
 
     wtf(studentai, 3);
     wtf(balleriai, 4);
@@ -47,40 +47,48 @@ void dalinimoBudas2(std::vector<Studentas>& studentai, std::vector<Studentas>& b
 
 double skaiciuotiGalutiniBala(const Studentas& studentas, const std::string& tipas) {
     if (tipas == "Vid") {
-        double tarpiniuVidurkis = std::accumulate(studentas.tarpiniai_rezultatai.begin(), studentas.tarpiniai_rezultatai.end(), 0.0) / studentas.tarpiniai_rezultatai.size();
+        if (studentas.tarpiniai_rezultatai.empty()) {
+            return 0.0; // or handle the case when there are no intermediate results
+        }
+
+        double tarpiniuVidurkis = std::accumulate(studentas.tarpiniai_rezultatai.begin(), studentas.tarpiniai_rezultatai.end(), 0.0)
+                                 / static_cast<double>(studentas.tarpiniai_rezultatai.size());
         return tarpiniuVidurkis;
     } else if (tipas == "Med") {
-        std::vector<int> visiPazymiai = studentas.tarpiniai_rezultatai;
+        std::list<int> visiPazymiai = studentas.tarpiniai_rezultatai;
         visiPazymiai.push_back(studentas.egzamino_rezultatas);
-        std::sort(visiPazymiai.begin(), visiPazymiai.end());
+        visiPazymiai.sort();
 
         int dydis = visiPazymiai.size();
+        auto it = visiPazymiai.begin();
+
+        std::advance(it, dydis / 2);
+
         if (dydis % 2 == 0) {
             int vidurioIndeksas = dydis / 2;
-            return (visiPazymiai[vidurioIndeksas - 1] + visiPazymiai[vidurioIndeksas]) / 2.0;
+            return (*std::prev(it) + *it) / 2.0;
         } else {
-            return visiPazymiai[dydis / 2];
+            return *it;
         }
     } else {
         std::cout << "Netinkamas tipo, naudojamas vidurkis." << std::endl;
-        double tarpiniuVidurkis = std::accumulate(studentas.tarpiniai_rezultatai.begin(), studentas.tarpiniai_rezultatai.end(), 0.0) / studentas.tarpiniai_rezultatai.size();
-        return tarpiniuVidurkis;
+        return skaiciuotiGalutiniBala(studentas, "Vid"); // fallback to average if the type is invalid
     }
 }
 
-void ivestiDuomenisRanka(std::vector<Studentas>& studentai) {
+void ivestiDuomenisRanka(std::list<Studentas>& studentai) {
     int studentuSkaicius;
     std::cout << "Iveskite studentu skaiciu: ";
     std::cin >> studentuSkaicius;
 
-    studentai.resize(studentuSkaicius);
-
     for (int i = 0; i < studentuSkaicius; ++i) {
+        Studentas naujasStudentas;
+
         std::cout << "Iveskite " << i + 1 << "-ojo studento varda: ";
-        std::cin >> studentai[i].vardas;
+        std::cin >> naujasStudentas.vardas;
 
         std::cout << "Iveskite " << i + 1 << "-ojo studento pavarde: ";
-        std::cin >> studentai[i].pavarde;
+        std::cin >> naujasStudentas.pavarde;
 
         std::cout << "Iveskite " << i + 1 << "-ojo studento tarpinius rezultatus (baigti su -1): ";
         int tarpinis;
@@ -89,15 +97,17 @@ void ivestiDuomenisRanka(std::vector<Studentas>& studentai) {
             if (tarpinis == -1) {
                 break;
             }
-            studentai[i].tarpiniai_rezultatai.push_back(tarpinis);
+            naujasStudentas.tarpiniai_rezultatai.push_back(tarpinis);
         }
 
         std::cout << "Iveskite " << i + 1 << "-ojo studento egzamino rezultata: ";
-        std::cin >> studentai[i].egzamino_rezultatas;
+        std::cin >> naujasStudentas.egzamino_rezultatas;
+
+        studentai.push_back(naujasStudentas);
     }
 }
 
-void skaitytiDuomenisIsFailo(std::vector<Studentas>& studentai, const std::string& failoPavadinimas) {
+void skaitytiDuomenisIsFailo(std::list<Studentas>& studentai, const std::string& failoPavadinimas) {
     std::ifstream failas(failoPavadinimas);
 
     if (!failas) {
@@ -128,30 +138,32 @@ void skaitytiDuomenisIsFailo(std::vector<Studentas>& studentai, const std::strin
     failas.close();
 }
 
-void generuotiDuomenis(std::vector<Studentas>& studentai) {
+void generuotiDuomenis(std::list<Studentas>& studentai) {
     int studentuSkaicius;
     std::cout << "Iveskite studentu skaiciu: ";
     std::cin >> studentuSkaicius;
 
-    studentai.resize(studentuSkaicius);
-
     for (int i = 0; i < studentuSkaicius; ++i) {
+        Studentas naujasStudentas;
+
         std::cout << "Iveskite " << i + 1 << "-ojo studento varda: ";
-        std::cin >> studentai[i].vardas;
+        std::cin >> naujasStudentas.vardas;
 
         std::cout << "Iveskite " << i + 1 << "-ojo studento pavarde: ";
-        std::cin >> studentai[i].pavarde;
+        std::cin >> naujasStudentas.pavarde;
 
         for (int j = 0; j < 5; ++j) {
             int pazymys = rand() % 10 + 1;
-            studentai[i].tarpiniai_rezultatai.push_back(pazymys);
+            naujasStudentas.tarpiniai_rezultatai.push_back(pazymys);
         }
 
-        studentai[i].egzamino_rezultatas = rand() % 10 + 1;
+        naujasStudentas.egzamino_rezultatas = rand() % 10 + 1;
+
+        studentai.push_back(naujasStudentas);
     }
 }
 void generuotiFailus() {
-    const std::vector<int> irasuSkaiciai = {1000, 10000, 100000, 1000000, 10000000};
+    const std::list<int> irasuSkaiciai = {1000, 10000, 100000, 1000000, 10000000};
     const std::string sabloninisVardas = "Vardas";
     const std::string sabloninePavarde = "Pavarde";
 
@@ -184,7 +196,7 @@ void generuotiFailus() {
         std::cout << "Sukurtas failas: " << failoPavadinimas  << ", uztruko " << diff << "ms" << std::endl;
     }
 }
-void padalintiStudentusIFailus(const std::vector<Studentas>& studentai, const std::string& failasVargsiukai, const std::string& failasLyderiai) {
+void padalintiStudentusIFailus(const std::list<Studentas>& studentai, const std::string& failasVargsiukai, const std::string& failasLyderiai) {
     std::ofstream vargsiukaiFailas(failasVargsiukai);
     std::ofstream lyderiaiFailas(failasLyderiai);
 
