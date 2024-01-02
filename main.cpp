@@ -6,7 +6,8 @@
 
 int main() {
     char pasirinkimas;
-    std::list<Studentas> studentai;
+    std::vector<Studentas> studentai;
+    int dalinimoBudas;
 
     std::cout << "Pasirinkite buda, kaip vesti duomenis (I - ivesti ranka, S - skaityti is failo, G - generuoti atsitiktinai, F - generuoti failus): ";
     std::cin >> pasirinkimas;
@@ -55,13 +56,34 @@ int main() {
     std::cout << "Pasirinkite skaiciavimo buda (Vid arba Med): ";
     std::cin >> skaiciavimoBudas;
 
-    auto startRusiavimas = std::chrono::high_resolution_clock::now();//pradedamas matuoti rusiavimo laikas
+    auto startRusiavimas = std::chrono::high_resolution_clock::now();
     std::sort(studentai.begin(), studentai.end(), [](const Studentas& a, const Studentas& b) {
         return a.vardas < b.vardas;
     });
-    auto endRusiavimas = std::chrono::high_resolution_clock::now();//baigia matuoti rusiavimo laika
+    auto endRusiavimas = std::chrono::high_resolution_clock::now();
     auto durationRusiavimas = std::chrono::duration_cast<std::chrono::milliseconds>(endRusiavimas - startRusiavimas);
     std::cout << "Rusiavimas uztruko " << durationRusiavimas.count() << "ms" << std::endl;
+
+//    Dalinimas i kelis konteinerius
+
+    std::cout << "Iveskite dalinimo buda:" << std::endl;
+    std::cin >> dalinimoBudas;
+
+    if (dalinimoBudas != 1 && dalinimoBudas != 2) {
+        std::cout << "Neteisingas skaicius" << std::endl;
+        return 0;
+    }
+
+    std::vector<Studentas> vargsai;
+    std::vector<Studentas> baller;
+
+    std::sort(studentai.begin(), studentai.end(), [&](const Studentas& a, const Studentas& b) {
+        return skaiciuotiGalutiniBala(a, skaiciavimoBudas) < skaiciuotiGalutiniBala(b, skaiciavimoBudas);
+    });
+
+    if (dalinimoBudas == 1) dalinimoBudas1(studentai, vargsai, baller, skaiciavimoBudas);
+    else dalinimoBudas2(studentai, baller, skaiciavimoBudas);
+
 
     std::cout << std::left << std::setw(20) << "Vardas" << std::setw(20) << "Pavarde" << std::setw(20) << skaiciavimoBudas << std::endl;
     std::cout << std::setfill('-') << std::setw(60) << "" << std::setfill(' ') << std::endl;
@@ -71,7 +93,7 @@ int main() {
         std::cout << std::left << std::setw(20) << studentas.vardas << std::setw(20) << studentas.pavarde
                   << std::fixed << std::setprecision(2) << skaiciuotiGalutiniBala(studentas, skaiciavimoBudas) << std::endl;
     }
-    auto endIsvedimas = std::chrono::high_resolution_clock::now();//baigia matuoti isvedimo laika
+    auto endIsvedimas = std::chrono::high_resolution_clock::now();
     auto durationIsvedimas = std::chrono::duration_cast<std::chrono::milliseconds>(endIsvedimas - startIsvedimas);
     std::cout << "Isvedimas uztruko " << durationIsvedimas.count() << "ms" << std::endl;
 
