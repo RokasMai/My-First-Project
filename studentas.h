@@ -13,6 +13,8 @@ struct Studentas {
     int egzamino_rezultatas;
 };
 
+void dalinimoBudas1(std::vector<Studentas>&,std::vector<Studentas>&,std::vector<Studentas>&,std::string);
+void dalinimoBudas2(std::vector<Studentas>&,std::vector<Studentas>&,std::string);
 double skaiciuotiGalutiniBala(const Studentas& studentas, const std::string& tipas);
 void ivestiDuomenisRanka(std::vector<Studentas>& studentai);
 void skaitytiDuomenisIsFailo(std::vector<Studentas>& studentai, const std::string& failoPavadinimas);
