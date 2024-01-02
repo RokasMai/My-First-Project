@@ -3,10 +3,11 @@
 #include <algorithm>
 #include <iomanip>
 #include <chrono>
+#include <vector>
 
 int main() {
     char pasirinkimas;
-    std::vector<Studentas> studentai;
+    std::list<Studentas> studentai;
     int dalinimoBudas;
 
     std::cout << "Pasirinkite buda, kaip vesti duomenis (I - ivesti ranka, S - skaityti is failo, G - generuoti atsitiktinai, F - generuoti failus): ";
@@ -57,9 +58,15 @@ int main() {
     std::cin >> skaiciavimoBudas;
 
     auto startRusiavimas = std::chrono::high_resolution_clock::now();
-    std::sort(studentai.begin(), studentai.end(), [](const Studentas& a, const Studentas& b) {
+    std::vector<Studentas> studentaiVector(studentai.begin(), studentai.end());
+
+    // Sort the vector
+    std::sort(studentaiVector.begin(), studentaiVector.end(), [&](const Studentas& a, const Studentas& b) {
         return a.vardas < b.vardas;
     });
+
+    // Copy sorted vector back to the list
+    studentai.assign(studentaiVector.begin(), studentaiVector.end());
     auto endRusiavimas = std::chrono::high_resolution_clock::now();
     auto durationRusiavimas = std::chrono::duration_cast<std::chrono::milliseconds>(endRusiavimas - startRusiavimas);
     std::cout << "Rusiavimas uztruko " << durationRusiavimas.count() << "ms" << std::endl;
@@ -74,10 +81,10 @@ int main() {
         return 0;
     }
 
-    std::vector<Studentas> vargsai;
-    std::vector<Studentas> baller;
+    std::list<Studentas> vargsai;
+    std::list<Studentas> baller;
 
-    std::sort(studentai.begin(), studentai.end(), [&](const Studentas& a, const Studentas& b) {
+    studentai.sort([&](const Studentas& a, const Studentas& b) {
         return skaiciuotiGalutiniBala(a, skaiciavimoBudas) < skaiciuotiGalutiniBala(b, skaiciavimoBudas);
     });
 
